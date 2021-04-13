@@ -435,6 +435,10 @@ h1, h2, h3, h4, h5, h6, figure {
   background: rgba(45, 64, 89, 0.06);
 }
 
+#fh5co-about-section h3{
+  display: inline-block;
+}
+
 #fh5co-featured-section,
 #fh5co-intro-section,
 #fh5co-services-section,
