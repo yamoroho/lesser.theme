@@ -1,3 +1,3 @@
 <?php get_header(); ?>
-archive-blog
+ <h1>Ошибка 404</h1>
 <?php get_footer(); ?>

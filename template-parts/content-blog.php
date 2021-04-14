@@ -14,6 +14,6 @@
     </div>
   </div>
   <div class="col-md-4">
-    <?php get_sidebar('single-blog'); ?>
+    <?php get_sidebar('single'); ?>
   </div>
 </div>

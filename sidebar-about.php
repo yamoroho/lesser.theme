@@ -4,11 +4,11 @@
  *
  */
 
-if ( ! is_active_sidebar( 'sidebar-single-blog' ) ) {
+if ( ! is_active_sidebar( 'sidebar-about' ) ) {
 	return;
 }
 ?>
 
 <aside class="sidebar">
-	<?php dynamic_sidebar( 'sidebar-single-blog' ); ?>
+	<?php dynamic_sidebar( 'sidebar-about' ); ?>
 </aside><!-- #secondary -->

@@ -24,15 +24,7 @@ Template Name: Страница О нас
 					</div>
 				</div>
 				<div class="col-md-4">
-					<aside class="sidebar">
-						<div class="row">
-							<div class="col-md-12 side">
-								<h3>Paragraph</h3>
-								<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-							</div>
-
-						</div>
-					</aside>
+          <?php get_sidebar('about'); ?>
 				</div>
 			</div>
 		</div>

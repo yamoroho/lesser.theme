@@ -5,7 +5,6 @@ Template Name: Страница портфолио
 ?>
 
 <?php get_header(); ?>
-Custom portfolio
 <div id="fh5co-work-section">
 		<div class="container">
 			<div class="row">

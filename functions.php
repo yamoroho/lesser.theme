@@ -132,8 +132,8 @@ add_action( 'after_setup_theme', 'lesser_theme_setup');
 function lesser_theme_widgets_init() {
 	register_sidebar(
 		array(
-			'name'          => esc_html__( 'Sidebar in single-page blog', 'lessertheme' ),
-			'id'            => 'sidebar-single-blog',
+			'name'          => esc_html__( 'Sidebar in single-page', 'lessertheme' ),
+			'id'            => 'sidebar-single',
 			'description'   => esc_html__( 'Добавьте виджеты сюда.', 'lessertheme' ),
 			'before_widget' => '<div class="row"><div class="col-md-12 side">',
 			'after_widget'  => '</div></div>',
@@ -142,19 +142,43 @@ function lesser_theme_widgets_init() {
     )
 	);
   register_sidebar(
-    array(
-			'name'          => esc_html__( 'Sidebar in single-page portfolio', 'lessertheme' ),
-			'id'            => 'sidebar-single-portfolio',
+		array(
+			'name'          => esc_html__( 'Sidebar in about-page', 'lessertheme' ),
+			'id'            => 'sidebar-about',
 			'description'   => esc_html__( 'Добавьте виджеты сюда.', 'lessertheme' ),
 			'before_widget' => '<div class="row"><div class="col-md-12 side">',
 			'after_widget'  => '</div></div>',
 			'before_title'  => '<h3 class="widget-title">',
 			'after_title'   => '</h3>',
-		)
+    )
+	);
+  register_sidebar(
+		array(
+			'name'          => esc_html__( 'Sidebar category in footer', 'lessertheme' ),
+			'id'            => 'sidebar-footer-category',
+			'description'   => esc_html__( 'Сайдбар категорий в футере.', 'lessertheme' ),
+			'before_widget' => '<div class="row"><div class="col-md-12 side">',
+			'after_widget'  => '</div></div>',
+			'before_title'  => '<h3 class="widget-title">',
+			'after_title'   => '</h3>',
+    )
+	);
+  register_sidebar(
+		array(
+			'name'          => esc_html__( 'Sidebar links in footer', 'lessertheme' ),
+			'id'            => 'sidebar-footer-links',
+			'description'   => esc_html__( 'Сайдбар ссылок в футере.', 'lessertheme' ),
+			'before_widget' => '<div class="row"><div class="col-md-12 side">',
+			'after_widget'  => '</div></div>',
+			'before_title'  => '<h3 class="widget-title">',
+			'after_title'   => '</h3>',
+    )
 	);
 
 }
 add_action( 'widgets_init', 'lesser_theme_widgets_init' );
+
+
 
 /**
  * Добавление нового виджета Category_Links_Widget.
@@ -187,26 +211,23 @@ class Category_Links_Widget extends WP_Widget {
 	 */
 	function widget( $args, $instance ) {
 		$title = $instance['title'];
-    $description = $instance['description'];
-    $link = $instance['link'];
+    $number_of_links = $instance['number_of_links'];
 
 
 		echo $args['before_widget'];
 		if ( ! empty( $title ) ) {
 			echo $args['before_title'] . $title . $args['after_title'];
 		}
-    if ( ! empty( $number_of_links ) ) {
-			
-		}
-    
-    // wp_list_categories(array(
-    //   'taxonomy'     => 'blog_category', // название таксономии
-    //   'orderby'      => 'name',  // сортируем по названиям
-    //   'title_li'     => ''       // список без заголовка
-    // ));
+    $post_type = get_post_type();
+    if ($post_type == 'blog') {
+      $taxonomy = 'blog_category';
+    }
+    if ($post_type == 'post') {
+      $taxonomy = 'category';
+    }
 
     $categories = get_categories( [
-      'taxonomy'     => 'category',
+      'taxonomy'     => $taxonomy,
       'type'         => 'post',
       'child_of'     => 0,
       'parent'       => '',
@@ -216,21 +237,17 @@ class Category_Links_Widget extends WP_Widget {
       'hierarchical' => 1,
       'exclude'      => '',
       'include'      => '',
-      'number'       => 0,
+      'number'       => $number_of_links,
       'pad_counts'   => false,
     ] );
-
-   
 
     echo '<ul>';
     foreach( $categories as $category ){
       echo '<li><i class="icon-check"></i><a href="' . get_category_link( $category->term_id ) . '" title="' . sprintf( __( "View all posts in %s" ), $category->name ) . '" ' . '>' . $category->name.'</a> </li> ';
     }
     echo '</ul>';
-
-    // var_dump($categories);
-	
-
+  
+      
 		echo $args['after_widget'];
 	}
 
@@ -241,8 +258,8 @@ class Category_Links_Widget extends WP_Widget {
 	 */
 	function form( $instance ) {
 		$title = @ $instance['title'] ?: 'Категории';
-    $number_of_links = @ $instance['number_of_links'] ?: '8';
-    // $post_type = @ $instance['post_type'] ?: 'blog';
+    $number_of_links = @ $instance['number_of_links'] ?: '5';
+
 
 
 		?>
@@ -251,13 +268,9 @@ class Category_Links_Widget extends WP_Widget {
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
     <p>
-			<label for="<?php echo $this->get_field_id( 'number_of_links' ); ?>"><?php _e( 'Максимальное количество:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'number_of_links' ); ?>"><?php _e( 'Максимальное количество категорий:' ); ?></label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'number_of_links' ); ?>" name="<?php echo $this->get_field_name( 'number_of_links' ); ?>" type="text" value="<?php echo esc_attr( $number_of_links ); ?>">
 		</p>
-    <!-- <p>
-			<label for="<?php echo $this->get_field_id( 'post_type' ); ?>"><?php _e( 'Тип поста (blog или portfolio):' ); ?></label> 
-			<input class="widefat" id="<?php echo $this->get_field_id( 'post_type' ); ?>" name="<?php echo $this->get_field_name( 'post_type' ); ?>" type="text" value="<?php echo esc_attr( $post_type ); ?>">
-		</p> -->
 		<?php 
 	}
 
@@ -275,7 +288,6 @@ class Category_Links_Widget extends WP_Widget {
 		$instance = array();
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
     $instance['number_of_links'] = ( ! empty( $new_instance['number_of_links'] ) ) ? strip_tags( $new_instance['number_of_links'] ) : '';
-   // $instance['link'] = ( ! empty( $new_instance['link'] ) ) ? strip_tags( $new_instance['link'] ) : '';
 
 		return $instance;
 	}
@@ -287,8 +299,6 @@ class Category_Links_Widget extends WP_Widget {
 			return;
 
 		$theme_url = get_stylesheet_directory_uri();
-
-		wp_enqueue_script('category_links_widget_script', $theme_url .'/category_links_widget_script.js' );
 	}
 
 	// стили виджета
@@ -312,6 +322,144 @@ function register_category_links_widget() {
 }
 add_action( 'widgets_init', 'register_category_links_widget' );
 
+/**
+ * Добавление нового виджета Social_Networks_Widget.
+ */
+class Social_Networks_Widget extends WP_Widget {
+
+	// Регистрация виджета используя основной класс
+	function __construct() {
+		// вызов конструктора выглядит так:
+		// __construct( $id_base, $name, $widget_options = array(), $control_options = array() )
+		parent::__construct(
+			'social_networks_widget', // ID виджета, если не указать (оставить ''), то ID будет равен названию класса в нижнем регистре: social_networks_widget
+			'Социальные сети',
+			array( 'description' => 'Ссылки на социальные сети', 
+      'classname' => 'widget-social_networks', )
+		);
+
+		// скрипты/стили виджета, только если он активен
+		if ( is_active_widget( false, false, $this->id_base ) || is_customize_preview() ) {
+			add_action('wp_enqueue_scripts', array( $this, 'add_social_networks_widget_scripts' ));
+			add_action('wp_head', array( $this, 'add_social_networks_widget_style' ) );
+		}
+	}
+
+	/**
+	 * Вывод виджета во Фронт-энде
+	 *
+	 * @param array $args     аргументы виджета.
+	 * @param array $instance сохраненные данные из настроек
+	 */
+	function widget( $args, $instance ) {
+		$title = $instance['title'];
+    $link_facebook = $instance['link_facebook'];
+    $link_instagram = $instance['link_instagram'];
+    $link_twitter = $instance['link_twitter'];
+
+
+		echo $args['before_widget'];
+    if ( ! empty( $title ) ) {
+			echo $args['before_title'] . $title . $args['after_title'];
+		}
+    echo '<ul class="fh5co-social">';		
+    if ( ! empty( $link_twitter ) ) {
+			echo '<li><a href="' . $link_twitter . '"><i class="icon-twitter"></i> Twitter</a></li>';
+		}
+    if ( ! empty( $link_facebook  ) ) {
+			echo '<li><a href="' . $link_facebook . '"><i class="icon-facebook"></i> Facebook</a></li>';
+		}
+    if ( ! empty( $link_instagram ) ) {
+			echo '<li><a href="' . $link_instagram . '"><i class="icon-instagram"></i> Instagram</a></li>';
+		}
+    echo '</ul>';
+		echo $args['after_widget'];
+	}
+
+	/**
+	 * Админ-часть виджета
+	 *
+	 * @param array $instance сохраненные данные из настроек
+	 */
+	function form( $instance ) {
+		$title = @ $instance['title'] ?: 'Наши соцсети';
+    $link_facebook = @ $instance['link_facebook'] ?: 'https://www.facebook.com/';
+    $link_instagram = @ $instance['link_instagram'] ?: 'https://www.instagram.com/';
+    $link_twitter = @ $instance['link_twitter'] ?: 'https://twitter.com/';
+
+
+		?>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Заголовок:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+    <p>
+			<label for="<?php echo $this->get_field_id( 'link_facebook' ); ?>"><?php _e( 'Ссылка на Facebook:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'link_facebook' ); ?>" name="<?php echo $this->get_field_name( 'link_facebook' ); ?>" type="text" value="<?php echo esc_attr( $link_facebook ); ?>">
+		</p>
+    <p>
+			<label for="<?php echo $this->get_field_id( 'link_instagram' ); ?>"><?php _e( 'Ссылка на Instagram:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'link_instagram' ); ?>" name="<?php echo $this->get_field_name( 'link_instagram' ); ?>" type="text" value="<?php echo esc_attr( $link_instagram ); ?>">
+		</p>
+    <p>
+			<label for="<?php echo $this->get_field_id( 'link_twitter' ); ?>"><?php _e( 'Ссылка на Twitter:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'link_twitter' ); ?>" name="<?php echo $this->get_field_name( 'link_twitter' ); ?>" type="text" value="<?php echo esc_attr( $link_twitter ); ?>">
+		</p>
+		<?php 
+	}
+
+	/**
+	 * Сохранение настроек виджета. Здесь данные должны быть очищены и возвращены для сохранения их в базу данных.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance новые настройки
+	 * @param array $old_instance предыдущие настройки
+	 *
+	 * @return array данные которые будут сохранены
+	 */
+	function update( $new_instance, $old_instance ) {
+		$instance = array();
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+    $instance['link_facebook'] = ( ! empty( $new_instance['link_facebook'] ) ) ? strip_tags( $new_instance['link_facebook'] ) : '';
+    $instance['link_instagram'] = ( ! empty( $new_instance['link_instagram'] ) ) ? strip_tags( $new_instance['link_instagram'] ) : '';
+    $instance['link_twitter'] = ( ! empty( $new_instance['link_twitter'] ) ) ? strip_tags( $new_instance['link_twitter'] ) : '';
+
+		return $instance;
+	}
+
+	// скрипт виджета
+	function add_social_networks_widget_scripts() {
+		// фильтр чтобы можно было отключить скрипты
+		if( ! apply_filters( 'show_social_networks_widget_script', true, $this->id_base ) )
+			return;
+
+		$theme_url = get_stylesheet_directory_uri();
+
+		wp_enqueue_script('social_networks_widget_script', $theme_url .'/social_networks_widget_script.js' );
+	}
+
+	// стили виджета
+	function add_social_networks_widget_style() {
+		// фильтр чтобы можно было отключить стили
+		if( ! apply_filters( 'show_social_networks_widget_style', true, $this->id_base ) )
+			return;
+		?>
+		<style type="text/css">
+			.my_widget a{ display:inline; }
+		</style>
+		<?php
+	}
+
+} 
+// конец класса Social_Networks_Widget
+
+// регистрация Social_Networks_Widget в WordPress
+function register_social_networks_widget() {
+	register_widget( 'Social_Networks_Widget' );
+}
+add_action( 'widgets_init', 'register_social_networks_widget' );
+
 // Подключение стилей и скриптов
 add_action( 'wp_enqueue_scripts', 'enqueue_lesser_style' );
 function enqueue_lesser_style() {
@@ -323,7 +471,7 @@ function enqueue_lesser_style() {
   wp_enqueue_style( 'bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.css', 'lesser-theme', time());
   wp_enqueue_style( 'icomoon', get_template_directory_uri() . '/assets/css/icomoon.css', 'lesser-theme', time());
   wp_enqueue_style( 'simple-line-icons', get_template_directory_uri() . '/assets/css/simple-line-icons.css', 'lesser-theme', time());
-  wp_enqueue_style( 'lesser-theme', get_template_directory_uri() . '/assets/css/lesser-theme.css', 'style', time());
+  wp_enqueue_style( 'lesser-theme', get_template_directory_uri() . '/assets/css/lesser-theme.css', null, time());
   
   wp_deregister_script( 'jquery-core' );
 	wp_register_script( 'jquery-core', '//code.jquery.com/jquery-3.6.0.min.js');

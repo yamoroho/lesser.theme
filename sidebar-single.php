@@ -4,11 +4,11 @@
  *
  */
 
-if ( ! is_active_sidebar( 'sidebar-single-portfolio' ) ) {
+if ( ! is_active_sidebar( 'sidebar-single' ) ) {
 	return;
 }
 ?>
 
 <aside class="sidebar">
-	<?php dynamic_sidebar( 'sidebar-single-portfolio' ); ?>
+	<?php dynamic_sidebar( 'sidebar-single' ); ?>
 </aside><!-- #secondary -->
